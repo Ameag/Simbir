@@ -3,14 +3,14 @@ using System.Security.Cryptography;
 
 namespace Simbir.middleware
 {
-    public class PasswordHasher
+    public class PasswordHash
     {
             private const int SaltSize = 16;
             private const int Iterations = 10000;
             private const int HashSize = 20;
 
             //Принимает пароль и возвращает его хеш в виде строки шестнадцатеричного формата
-            public static string HashPassword(string password)
+            public string PasswordHasher(string password)
             {
                 using (var rng = new RNGCryptoServiceProvider())
                 {
@@ -33,7 +33,7 @@ namespace Simbir.middleware
             }
 
             // принимает пароль и сохраненный хеш и проверяет их соответствие
-            public static bool VerifyPassword(string password, string hashedPassword)
+            public bool VerifyPassword(string password, string hashedPassword)
             {
                 var bytes = new byte[hashedPassword.Length / 2];
                 for (int i = 0; i < bytes.Length; i++)

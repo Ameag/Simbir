@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Simbir.Data.Interfaces;
 using Simbir.Model;
 using Simbir.Service.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
 
 namespace Simbir.Controllers
 {
@@ -17,7 +23,7 @@ namespace Simbir.Controllers
         }
 
         [HttpGet("/api/accounts")] // Добавляем атрибут Route с указанием HTTP-метода и URL-адреса
-        public async Task<ActionResult<List<Account>>> GetAccounts()
+        public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
         {
             var response = await _accountService.GetAccount();
             var accounts = new List<Account>();
@@ -25,7 +31,6 @@ namespace Simbir.Controllers
             {
                 accounts.Add(new Account()
                 {
-                    id = account.id,
                     login = account.login,
                     password = account.password,
                     is_admin = account.is_admin
@@ -34,11 +39,18 @@ namespace Simbir.Controllers
             return accounts;
         }
 
-        [HttpPost("/api/accounts/signUp/{login}/{password}")]
-        public async Task<ActionResult<HttpStatusCode>> PostAccounts(string login, string password)
+        [HttpPost("/api/accounts/SignUp")]
+        public async Task<ActionResult<HttpStatusCode>> SignUp([FromBody] AccountInput model)
         {
-            var response = await _accountService.PostAccount(login,password);
+            var response = await _accountService.SignUp(model);
             return response.Status;
+        }
+
+        [HttpPost("/api/Account/SignIn")]
+        public async Task<ActionResult<string>> SignIn([FromBody] AccountInput model)
+        {
+            var response = await _accountService.SignIn(model);
+            return Ok(new { Token = response.Data });
         }
     }
 }

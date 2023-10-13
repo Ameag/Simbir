@@ -3,7 +3,7 @@ using Simbir.Data.Interfaces;
 using Simbir.Model;
 using System.Net;
 
-namespace Simbir.Data.Repository
+namespace Simbir.Data
 {
     public class AccountRepository : IAccountRepository
     {
@@ -22,20 +22,15 @@ namespace Simbir.Data.Repository
 
         public async Task<bool> Delete(Account entity)
         {
-             _db.Accounts.Remove(entity);
-             _db.SaveChangesAsync();
+            _db.Accounts.Remove(entity);
+            _db.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<Account> Get(int id)
+        public async Task<Account> Get(string login)
         {
-            return await _db.Accounts.FirstOrDefaultAsync(x => x.id == id);
-        }
-
-        public Account GetAccount(int id) 
-        {
-            throw new NotImplementedException();
+            return await _db.Accounts.FirstOrDefaultAsync(x => x.login == login);
         }
 
         public async Task<List<Account>> Select()
@@ -43,5 +38,9 @@ namespace Simbir.Data.Repository
             return await _db.Accounts.ToListAsync();
         }
 
+        public async Task<Account> SignIn(Account entity)
+        {
+            return await _db.Accounts.FirstOrDefaultAsync(a => a.login == entity.login);
+        }
     }
 }
