@@ -47,6 +47,7 @@ namespace Simbir.Service.Implementations
                 {
                     login = model.login,
                 });
+                // ПЕРЕДЕЛАТЬ ХЕШИРОВАНИЕ НАХУЙ УАААААААААААААААААА
                 var a = passwordHash.PasswordHasher(model.password);
                 if (a == account.password)
                 {
