@@ -4,6 +4,7 @@ using Simbir.Middleware;
 using Simbir.Model;
 using Simbir.Service.Interfaces;
 using Simbir.Service.Response;
+using System.Net;
 
 namespace Simbir.Service.Implementations
 {
@@ -20,18 +21,18 @@ namespace Simbir.Service.Implementations
             jWTAuthManager = new JWTAuthManager(jwtSettings);
         }
 
-        public async Task<IBaseResponse<IEnumerable<Account>>> GetAccount()
+        public async Task<IBaseResponse<Account>> GetAccount(string login)
         {
-            var baseResponse = new BaseResponse<IEnumerable<Account>>();
+            var baseResponse = new BaseResponse<Account>();
             try
             {
-                var account = await _accountRepository.Select();
-                baseResponse.Data= account;
+                var account = await _accountRepository.Get(login);
+                baseResponse.Data = account;
                 return baseResponse;
             }
             catch (Exception ex)
             {
-                return new BaseResponse<IEnumerable<Account>>()
+                return new BaseResponse<Account>()
                 {
                     Description = $"[GetAccount] : {ex.Message}"
                 };
@@ -45,11 +46,17 @@ namespace Simbir.Service.Implementations
             {
                 var account = await _accountRepository.SignIn(new Account()
                 {
-                    login = model.login,
+                    username = model.login,
                 });
-                // ПЕРЕДЕЛАТЬ ХЕШИРОВАНИЕ НАХУЙ УАААААААААААААААААА
-                var a = passwordHash.PasswordHasher(model.password);
-                if (a == account.password)
+                if (account == null)
+                {
+                    return new BaseResponse<string>()
+                    {
+                        Description = "[UpdateAccount] : Аккаунт с логином не существует"
+                    };
+                }
+
+                if (passwordHash.VerifyPassword(model.password, account.salt, account.password))
                 {
                     var token = jWTAuthManager.GenerateJWT(model.login);
                     baseResponse.Data = token;
@@ -67,30 +74,63 @@ namespace Simbir.Service.Implementations
             {
                 return new BaseResponse<string>()
                 {
-                    Description = $"[GetAccount] : {ex.Message}"
+                    Description = $"[SignIn] : {ex.Message}"
                 };
             }
         }
 
-        public async Task<IBaseResponse<IEnumerable<Account>>> SignUp(AccountInput model)
+        public async Task<IBaseResponse<HttpStatusCode>> SignUp(AccountInput model)
         {
-            var baseResponse = new BaseResponse<IEnumerable<Account>>();
-            model.password = passwordHash.PasswordHasher(model.password);
+            var baseResponse = new BaseResponse<HttpStatusCode>();
+            var salt = passwordHash.CreateSalt();
+            model.password = passwordHash.HashPassword(model.password, salt);
             try
             {
                 var code = await _accountRepository.Create(new Account() 
                 { 
-                    login = model.login,
+                    username = model.login,
                     password= model.password,
+                    salt = salt
                 });
                 baseResponse.Status = code;
                 return baseResponse;
             }
             catch (Exception ex)
             {
-                return new BaseResponse<IEnumerable<Account>>()
+                return new BaseResponse<HttpStatusCode>()
                 {
-                    Description = $"[GetAccount] : {ex.Message}"
+                    Description = $"[SignUp] : {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<IBaseResponse<HttpStatusCode>> UpdateAccount(string login, AccountInput model)
+        {
+            var baseResponse = new BaseResponse<HttpStatusCode>();
+            try
+            {
+                var account = await _accountRepository.Get(login);
+                if (account == null)
+                {
+                    return new BaseResponse<HttpStatusCode>()
+                    {
+                        Description = $"[UpdateAccount] : Аккаунт с логином {login} не существует"
+                    };
+                }
+                model.password = passwordHash.HashPassword(model.password, account.salt);
+
+                account.username= model.login;
+                account.password= model.password;
+                var code = await _accountRepository.Update(account);
+                baseResponse.Status = code;
+                return baseResponse;
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<HttpStatusCode>()
+                {
+                    Description = $"[UpdateAccount] : {ex.Message}"
                 };
             }
         }

@@ -8,5 +8,6 @@ namespace Simbir.Data.Interfaces
         Task<T> Get(string id);
         Task<List<T>> Select();
         Task<bool> Delete(T entity);
+        Task<HttpStatusCode> Update(T entity);
     }
 }

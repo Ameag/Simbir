@@ -1,31 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Simbir.Data.Interfaces;
+using Simbir.Data;
 using Simbir.Model;
+using Simbir.Repository.Interfaces;
 using System.Net;
 
-namespace Simbir.Data
+namespace Simbir.Repository
 {
-    public class AccountRepository : IAccountRepository
+    public class PaymentRepository : IPaymentRepository
     {
         private readonly ApplicationDbContext _db;
-        public AccountRepository(ApplicationDbContext db)
+        public PaymentRepository(ApplicationDbContext db)
         {
             _db = db;
         }
-        public async Task<HttpStatusCode> Create(Account entity)
+        public Task<HttpStatusCode> Create(Account entity)
         {
-            await _db.Accounts.AddAsync(entity);
-            await _db.SaveChangesAsync();
-
-            return HttpStatusCode.OK;
+            throw new NotImplementedException();
         }
 
-        public async Task<bool> Delete(Account entity)
+        public Task<bool> Delete(Account entity)
         {
-            _db.Accounts.Remove(entity);
-            _db.SaveChangesAsync();
-
-            return true;
+            throw new NotImplementedException();
         }
 
         public async Task<Account> Get(string login)
@@ -33,14 +28,9 @@ namespace Simbir.Data
             return await _db.Accounts.FirstOrDefaultAsync(x => x.username == login);
         }
 
-        public async Task<List<Account>> Select()
+        public Task<List<Account>> Select()
         {
-            return await _db.Accounts.ToListAsync();
-        }
-
-        public async Task<Account> SignIn(Account entity)
-        {
-            return await _db.Accounts.FirstOrDefaultAsync(a => a.username == entity.username);
+            throw new NotImplementedException();
         }
 
         public async Task<HttpStatusCode> Update(Account entity)

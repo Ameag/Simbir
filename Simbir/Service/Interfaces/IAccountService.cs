@@ -1,12 +1,14 @@
 ﻿using Simbir.Model;
 using Simbir.Service.Response;
+using System.Net;
 
 namespace Simbir.Service.Interfaces
 {
     public interface IAccountService
     {
-        Task<IBaseResponse<IEnumerable<Account>>> GetAccount();
-        Task<IBaseResponse<IEnumerable<Account>>> SignUp(AccountInput model);
+        Task<IBaseResponse<Account>> GetAccount(string login);
+        Task<IBaseResponse<HttpStatusCode>> SignUp(AccountInput model);
         Task<IBaseResponse<string>> SignIn(AccountInput accountInput);
+        Task<IBaseResponse<HttpStatusCode>> UpdateAccount(string login, AccountInput model);
     }
 }

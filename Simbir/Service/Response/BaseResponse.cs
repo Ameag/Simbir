@@ -14,5 +14,6 @@ namespace Simbir.Service.Response
     {
         T Data { get; set; }
         HttpStatusCode Status { get; set; }
+        string Description { get; set; }
     }
 }

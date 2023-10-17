@@ -18,10 +18,10 @@ namespace Simbir.Middleware
         public string GenerateJWT(string login)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = Encoding.UTF8.GetBytes("mega_secret_strings");
-            var issuer = "mega_secret_strings";
-            var audience = "mega_secret_strings";
-            var expiresInMinutes = int.Parse("60");
+            var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
+            var issuer = jwtSettings["Issuer"];
+            var audience = jwtSettings["Audience"];
+            var expiresInMinutes = int.Parse(jwtSettings["ExpiresInMinutes"]);
 
             var claims = new List<Claim>
             {
