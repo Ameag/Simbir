@@ -4,9 +4,8 @@ using System.Net;
 
 namespace Simbir.Repository.Interfaces
 {
-    public interface IAccountRepository : IBaseRepository<Account>
+    public interface IBlackListRepository : IBaseRepository<BlackList>
     {
-        Task<Account> SignIn(Account entity);
-
+        Task<HttpStatusCode> SignOut(BlackList entity);
     }
 }

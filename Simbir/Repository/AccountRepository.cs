@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Simbir.Data;
 using Simbir.Data.Interfaces;
 using Simbir.Model;
+using Simbir.Repository.Interfaces;
 using System.Net;
 
-namespace Simbir.Data
+namespace Simbir.Repository
 {
     public class AccountRepository : IAccountRepository
     {
@@ -20,12 +22,9 @@ namespace Simbir.Data
             return HttpStatusCode.OK;
         }
 
-        public async Task<bool> Delete(Account entity)
+        public Task<HttpStatusCode> Delete(int id)
         {
-            _db.Accounts.Remove(entity);
-            _db.SaveChangesAsync();
-
-            return true;
+            throw new NotImplementedException();
         }
 
         public async Task<Account> Get(string login)

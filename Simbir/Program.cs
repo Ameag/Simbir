@@ -4,10 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Simbir.Data;
-using Simbir.Data.Interfaces;
 using Simbir.Repository;
 using Simbir.Repository.Interfaces;
 using Simbir.Service.Implementations;
+using Simbir.Service.Interfaces;
 using Simbir.Service.Interfaces;
 using System.Text;
 
@@ -66,9 +66,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountAdminRepository, AccountAdminRepository>();
+builder.Services.AddScoped<IAccountAdminService, AccountAdminService>();
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+builder.Services.AddScoped<IBlackListRepository, BlackListRepository>();
 
 var app = builder.Build();
 

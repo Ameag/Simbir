@@ -18,7 +18,7 @@ namespace Simbir.Repository
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(Account entity)
+        public Task<HttpStatusCode> Delete(int id)
         {
             throw new NotImplementedException();
         }

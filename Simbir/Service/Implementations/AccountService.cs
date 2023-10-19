@@ -2,6 +2,7 @@
 using Simbir.middleware;
 using Simbir.Middleware;
 using Simbir.Model;
+using Simbir.Repository.Interfaces;
 using Simbir.Service.Interfaces;
 using Simbir.Service.Response;
 using System.Net;
@@ -11,18 +12,27 @@ namespace Simbir.Service.Implementations
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
+        private readonly IBlackListRepository _blackListRepository;
         private readonly PasswordHash passwordHash;
         private readonly JWTAuthManager jWTAuthManager;
+        private readonly JWTBlackListCheck jWTBlackListCheck;
 
-        public AccountService(IAccountRepository accountRepository, IConfiguration jwtSettings)
+        public AccountService(IAccountRepository accountRepository, IConfiguration jwtSettings, IBlackListRepository blackListRepository)
         {
             _accountRepository = accountRepository;
+            _blackListRepository = blackListRepository;
             passwordHash = new PasswordHash();
             jWTAuthManager = new JWTAuthManager(jwtSettings);
+            jWTBlackListCheck = new JWTBlackListCheck(blackListRepository);
         }
 
-        public async Task<IBaseResponse<Account>> GetAccount(string login)
+        public async Task<IBaseResponse<Account>> GetAccount(string login, string jwtToken)
         {
+            if (await jWTBlackListCheck.CheckJWT(jwtToken))
+            {
+                throw new Exception("Не авторизован");
+            }
+
             var baseResponse = new BaseResponse<Account>();
             try
             {
@@ -46,7 +56,7 @@ namespace Simbir.Service.Implementations
             {
                 var account = await _accountRepository.SignIn(new Account()
                 {
-                    username = model.login,
+                    username = model.username,
                 });
                 if (account == null)
                 {
@@ -58,7 +68,7 @@ namespace Simbir.Service.Implementations
 
                 if (passwordHash.VerifyPassword(model.password, account.salt, account.password))
                 {
-                    var token = jWTAuthManager.GenerateJWT(model.login);
+                    var token = jWTAuthManager.GenerateJWT(model.username);
                     baseResponse.Data = token;
                     return baseResponse;
                 }
@@ -70,13 +80,32 @@ namespace Simbir.Service.Implementations
                     };
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new BaseResponse<string>()
                 {
                     Description = $"[SignIn] : {ex.Message}"
                 };
             }
+        }
+
+        public async Task<IBaseResponse<HttpStatusCode>> SignOut(string token)
+        {
+            var baseResponse = new BaseResponse<HttpStatusCode>();
+            try
+            {
+                var code = await _blackListRepository.SignOut(new BlackList() { token = token });
+                baseResponse.Status = code;
+                return baseResponse;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<HttpStatusCode>()
+                {
+                    Description = $"[SignUp] : {ex.Message}"
+                };
+            }
+
         }
 
         public async Task<IBaseResponse<HttpStatusCode>> SignUp(AccountInput model)
@@ -86,10 +115,10 @@ namespace Simbir.Service.Implementations
             model.password = passwordHash.HashPassword(model.password, salt);
             try
             {
-                var code = await _accountRepository.Create(new Account() 
-                { 
-                    username = model.login,
-                    password= model.password,
+                var code = await _accountRepository.Create(new Account()
+                {
+                    username = model.username,
+                    password = model.password,
                     salt = salt
                 });
                 baseResponse.Status = code;
@@ -104,8 +133,12 @@ namespace Simbir.Service.Implementations
             }
         }
 
-        public async Task<IBaseResponse<HttpStatusCode>> UpdateAccount(string login, AccountInput model)
+        public async Task<IBaseResponse<HttpStatusCode>> UpdateAccount(string login, AccountInput model, string jwtToken)
         {
+            if (!await jWTBlackListCheck.CheckJWT(jwtToken))
+            {
+                throw new Exception("Не авторизован");
+            }
             var baseResponse = new BaseResponse<HttpStatusCode>();
             try
             {
@@ -119,8 +152,8 @@ namespace Simbir.Service.Implementations
                 }
                 model.password = passwordHash.HashPassword(model.password, account.salt);
 
-                account.username= model.login;
-                account.password= model.password;
+                account.username = model.username;
+                account.password = model.password;
                 var code = await _accountRepository.Update(account);
                 baseResponse.Status = code;
                 return baseResponse;

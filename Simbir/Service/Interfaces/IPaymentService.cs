@@ -6,6 +6,6 @@ namespace Simbir.Service.Interfaces
 {
     public interface IPaymentService
     {
-        Task<IBaseResponse<HttpStatusCode>> Hesoyam(string login);
+        Task<IBaseResponse<HttpStatusCode>> Hesoyam(string login, string jwtToken);
     }
 }

@@ -20,8 +20,16 @@ namespace Simbir.Controllers
         [HttpPost("/api/Payment/Hesoyam/{accountId}")]
         public async Task<ActionResult<HttpStatusCode>> Hesoyam()
         {
+            var authHeader = Request.Headers["Authorization"];
+            var jwtToken = authHeader.ToString().Substring("bearer ".Length);
+
             var login = User.Identity.Name;
-            var response = await _paymentService.Hesoyam(login);
+            if (login == null)
+            {
+                Unauthorized();
+            }
+
+            var response = await _paymentService.Hesoyam(login, jwtToken);
             if (response.Description != null)
             {
                 throw new Exception(response.Description);

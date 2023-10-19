@@ -7,7 +7,7 @@ namespace Simbir.Data.Interfaces
         Task<HttpStatusCode> Create(T entity);
         Task<T> Get(string id);
         Task<List<T>> Select();
-        Task<bool> Delete(T entity);
+        Task<HttpStatusCode> Delete(int id);
         Task<HttpStatusCode> Update(T entity);
     }
 }

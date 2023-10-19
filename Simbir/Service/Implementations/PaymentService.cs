@@ -1,4 +1,5 @@
-﻿using Simbir.Model;
+﻿using Simbir.Middleware;
+using Simbir.Model;
 using Simbir.Repository.Interfaces;
 using Simbir.Service.Interfaces;
 using Simbir.Service.Response;
@@ -9,14 +10,21 @@ namespace Simbir.Service.Implementations
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
+        private readonly JWTBlackListCheck jWTBlackListCheck;
 
-        public PaymentService(IPaymentRepository paymentRepository)
+
+        public PaymentService(IPaymentRepository paymentRepository, IBlackListRepository blackListRepository)
         {
             _paymentRepository = paymentRepository;
+            jWTBlackListCheck = new JWTBlackListCheck(blackListRepository);
         }
 
-        public async Task<IBaseResponse<HttpStatusCode>> Hesoyam(string login)
+        public async Task<IBaseResponse<HttpStatusCode>> Hesoyam(string login, string jwtToken)
         {
+            if (await jWTBlackListCheck.CheckJWT(jwtToken))
+            {
+                throw new Exception("Не авторизован");
+            }
             var baseResponse = new BaseResponse<HttpStatusCode>();
             try
             {
