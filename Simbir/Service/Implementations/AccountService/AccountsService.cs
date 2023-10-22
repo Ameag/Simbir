@@ -3,13 +3,14 @@ using Simbir.middleware;
 using Simbir.Middleware;
 using Simbir.Model;
 using Simbir.Repository.Interfaces;
-using Simbir.Service.Interfaces;
+using Simbir.Repository.Interfaces.AccountInterfaces;
+using Simbir.Service.Interfaces.AccountInterface;
 using Simbir.Service.Response;
 using System.Net;
 
-namespace Simbir.Service.Implementations
+namespace Simbir.Service.Implementations.AccountService
 {
-    public class AccountService : IAccountService
+    public class AccountsService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IBlackListRepository _blackListRepository;
@@ -17,7 +18,7 @@ namespace Simbir.Service.Implementations
         private readonly JWTAuthManager jWTAuthManager;
         private readonly JWTBlackListCheck jWTBlackListCheck;
 
-        public AccountService(IAccountRepository accountRepository, IConfiguration jwtSettings, IBlackListRepository blackListRepository)
+        public AccountsService(IAccountRepository accountRepository, IConfiguration jwtSettings, IBlackListRepository blackListRepository)
         {
             _accountRepository = accountRepository;
             _blackListRepository = blackListRepository;
@@ -135,7 +136,7 @@ namespace Simbir.Service.Implementations
 
         public async Task<IBaseResponse<HttpStatusCode>> UpdateAccount(string login, AccountInput model, string jwtToken)
         {
-            if (!await jWTBlackListCheck.CheckJWT(jwtToken))
+            if (await jWTBlackListCheck.CheckJWT(jwtToken))
             {
                 throw new Exception("Не авторизован");
             }

@@ -2,7 +2,7 @@
 using Simbir.Model;
 using System.Net;
 
-namespace Simbir.Repository.Interfaces
+namespace Simbir.Repository.Interfaces.AccountInterfaces
 {
     public interface IAccountRepository : IBaseRepository<Account>
     {

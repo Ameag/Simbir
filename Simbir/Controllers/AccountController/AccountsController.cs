@@ -5,13 +5,13 @@ using Microsoft.IdentityModel.Tokens;
 using Simbir.Data.Interfaces;
 using Simbir.Middleware;
 using Simbir.Model;
-using Simbir.Service.Interfaces;
+using Simbir.Service.Interfaces.AccountInterface;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
 
-namespace Simbir.Controllers
+namespace Simbir.Controllers.AccountController
 {
     [ApiController] // Добавляем атрибут ApiController
     public class AccountsController : Controller

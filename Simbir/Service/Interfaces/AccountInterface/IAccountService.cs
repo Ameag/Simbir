@@ -2,7 +2,7 @@
 using Simbir.Service.Response;
 using System.Net;
 
-namespace Simbir.Service.Interfaces
+namespace Simbir.Service.Interfaces.AccountInterface
 {
     public interface IAccountService
     {

@@ -1,21 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Simbir.Data;
+using Simbir.Data.Interfaces;
 using Simbir.Model;
 using Simbir.Repository.Interfaces;
+using Simbir.Repository.Interfaces.AccountInterfaces;
 using System.Net;
 
-namespace Simbir.Repository
+namespace Simbir.Repository.AccountRepository
 {
-    public class PaymentRepository : IPaymentRepository
+    public class AccountsRepository : IAccountRepository
     {
         private readonly ApplicationDbContext _db;
-        public PaymentRepository(ApplicationDbContext db)
+        public AccountsRepository(ApplicationDbContext db)
         {
             _db = db;
         }
-        public Task<HttpStatusCode> Create(Account entity)
+        public async Task<HttpStatusCode> Create(Account entity)
         {
-            throw new NotImplementedException();
+            await _db.Accounts.AddAsync(entity);
+            await _db.SaveChangesAsync();
+
+            return HttpStatusCode.OK;
         }
 
         public Task<HttpStatusCode> Delete(int id)
@@ -28,9 +33,15 @@ namespace Simbir.Repository
             return await _db.Accounts.FirstOrDefaultAsync(x => x.username == login);
         }
 
+
         public Task<List<Account>> Select(int start, int count)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Account> SignIn(Account entity)
+        {
+            return await _db.Accounts.FirstOrDefaultAsync(a => a.username == entity.username);
         }
 
         public async Task<HttpStatusCode> Update(Account entity)

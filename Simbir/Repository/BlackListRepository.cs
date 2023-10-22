@@ -29,11 +29,6 @@ namespace Simbir.Repository
             return await _db.BlackList.FirstOrDefaultAsync(x => x.token == token);
         }
 
-        public Task<List<BlackList>> Select()
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<HttpStatusCode> Update(BlackList entity)
         {
             throw new NotImplementedException();
@@ -47,5 +42,9 @@ namespace Simbir.Repository
             return HttpStatusCode.OK;
         }
 
+        public Task<List<BlackList>> Select(int start, int count)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Simbir.Data;
-using Simbir.Data.Interfaces;
 using Simbir.Model;
 using Simbir.Repository.Interfaces;
+using Simbir.Repository.Interfaces.AccountInterfaces;
 using System.Net;
 
-namespace Simbir.Repository
+namespace Simbir.Repository.AccountRepository.AccountRepository
 {
-    public class AccountRepository : IAccountRepository
+    public class AccountAdminRepository : IAccountAdminRepository
     {
         private readonly ApplicationDbContext _db;
-        public AccountRepository(ApplicationDbContext db)
+        public AccountAdminRepository(ApplicationDbContext db)
         {
             _db = db;
         }
@@ -22,24 +22,27 @@ namespace Simbir.Repository
             return HttpStatusCode.OK;
         }
 
-        public Task<HttpStatusCode> Delete(int id)
+        public async Task<HttpStatusCode> Delete(int id)
         {
-            throw new NotImplementedException();
+            var account = await _db.Accounts.FindAsync(id);
+            if (account == null)
+            {
+                return HttpStatusCode.NotFound;
+            }
+            _db.Accounts.Remove(account);
+            await _db.SaveChangesAsync();
+            return HttpStatusCode.OK;
         }
 
-        public async Task<Account> Get(string login)
+        public async Task<Account> Get(string id)
         {
-            return await _db.Accounts.FirstOrDefaultAsync(x => x.username == login);
+            return await _db.Accounts.FirstOrDefaultAsync(x => x.id == int.Parse(id));
         }
 
-        public async Task<List<Account>> Select()
+        public async Task<List<Account>> Select(int start, int count)
         {
-            return await _db.Accounts.ToListAsync();
-        }
-
-        public async Task<Account> SignIn(Account entity)
-        {
-            return await _db.Accounts.FirstOrDefaultAsync(a => a.username == entity.username);
+            // Возвращаем заданное количество элементов
+            return await _db.Accounts.OrderBy(x => x.id).Skip(start - 1).Take(count).ToListAsync();
         }
 
         public async Task<HttpStatusCode> Update(Account entity)
@@ -60,6 +63,11 @@ namespace Simbir.Repository
                 // Возвращаем ошибку с сообщением исключения
                 throw ex;
             }
+        }
+
+        public async Task<bool> СheckAdmin(string login)
+        {
+            return await _db.Accounts.AnyAsync(x => x.username == login && x.is_admin == true);
         }
     }
 }
