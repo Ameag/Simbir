@@ -17,11 +17,13 @@ namespace Simbir.Service.Implementations.TransportService
     {
         private readonly ITransportRepository _transporstRepository;
         private readonly JWTBlackListCheck jWTBlackListCheck;
+        private readonly CheckTypeTransport checkTypeTransport;
 
         public TransporstService(ITransportRepository transporstRepository, IBlackListRepository blackListRepository)
         {
             _transporstRepository = transporstRepository;
             jWTBlackListCheck = new JWTBlackListCheck(blackListRepository);
+            checkTypeTransport = new CheckTypeTransport();
         }
 
         public async Task<IBaseResponse<HttpStatusCode>> AddTransport(TransportInput model, string jwtToken, string login)
@@ -38,23 +40,32 @@ namespace Simbir.Service.Implementations.TransportService
                 {
                     throw new Exception("аккаунт не найден");
                 }
-                var code = await _transporstRepository.Create(new Transport()
+
+                if (checkTypeTransport.Chek(model.transport_type))
                 {
-                    transport_type = model.transport_type,
-                    identifier = model.identifier,
-                    can_be_rented = model.can_be_rented,
-                    model = model.model,
-                    color = model.color,
-                    description = model.description,
-                    latitude = model.latitude,
-                    longitude = model.longitude,
-                    minute_price= model.minute_price,
-                    day_price = model.day_price,
-                    owner_id = account
-                    
-                });
-                baseResponse.Status = code;
-                return baseResponse;
+                    var code = await _transporstRepository.Create(new Transport()
+                    {
+                        transport_type = model.transport_type,
+                        identifier = model.identifier,
+                        can_be_rented = model.can_be_rented,
+                        model = model.model,
+                        color = model.color,
+                        description = model.description,
+                        latitude = model.latitude,
+                        longitude = model.longitude,
+                        minute_price = model.minute_price,
+                        day_price = model.day_price,
+                        owner_id = account
+
+                    });
+                    baseResponse.Status = code;
+                    return baseResponse;
+                }
+                else
+                {
+                    throw new Exception("Неверный тип транспорта");
+                }
+
             }
             catch (Exception ex)
             {
@@ -86,7 +97,7 @@ namespace Simbir.Service.Implementations.TransportService
                     throw new Exception("не твой транспорт");
                 }
 
-                var code = await _transporstRepository.Delete(id);
+                  var code = await _transporstRepository.Delete(id);
                   baseResponse.Status = code;
                   return baseResponse;
             }
@@ -138,19 +149,26 @@ namespace Simbir.Service.Implementations.TransportService
                     throw new Exception("не твой транспорт");
                 }
 
-                transport.identifier = model.identifier;
-                transport.can_be_rented = model.can_be_rented;
-                transport.model = model.model;
-                transport.color = model.color;
-                transport.description= model.description;
-                transport.latitude= model.latitude;
-                transport.longitude= model.longitude;
-                transport.minute_price= model.minute_price;
-                transport.day_price = model.day_price;
+                if (checkTypeTransport.Chek(model.transport_type))
+                {
+                    transport.identifier = model.identifier;
+                    transport.can_be_rented = model.can_be_rented;
+                    transport.model = model.model;
+                    transport.color = model.color;
+                    transport.description = model.description;
+                    transport.latitude = model.latitude;
+                    transport.longitude = model.longitude;
+                    transport.minute_price = model.minute_price;
+                    transport.day_price = model.day_price;
 
-                var code = await _transporstRepository.Update(transport);
-                baseResponse.Status = code;
-                return baseResponse;
+                    var code = await _transporstRepository.Update(transport);
+                    baseResponse.Status = code;
+                    return baseResponse;
+                }
+                else
+                {
+                    throw new Exception("Неверный тип транспорта");
+                }
             }
             catch (Exception ex)
             {

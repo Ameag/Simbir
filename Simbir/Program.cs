@@ -79,6 +79,8 @@ builder.Services.AddScoped<IAccountAdminService, AccountAdminService>();
 
 builder.Services.AddScoped<ITransportRepository, TransportsRepository>();
 builder.Services.AddScoped<ITransportService, TransporstService>();
+builder.Services.AddScoped<ITransportAdminService, TransportAdminService>();
+builder.Services.AddScoped<ITransportAdminRepository, TransportAdminRepository>();
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
