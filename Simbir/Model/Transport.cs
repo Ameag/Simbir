@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data.Entity.Spatial;
 
 namespace Simbir.Model
 {

@@ -9,13 +9,17 @@ using Simbir.Repository.AccountRepository;
 using Simbir.Repository.AccountRepository.AccountRepository;
 using Simbir.Repository.Interfaces;
 using Simbir.Repository.Interfaces.AccountInterfaces;
+using Simbir.Repository.Interfaces.RentInterfaces;
 using Simbir.Repository.Interfaces.TransportInterfaces;
+using Simbir.Repository.RentRepository;
 using Simbir.Repository.TransportRepository;
 using Simbir.Service.Implementations;
 using Simbir.Service.Implementations.AccountService;
+using Simbir.Service.Implementations.RentService;
 using Simbir.Service.Implementations.TransportService;
 using Simbir.Service.Interfaces;
 using Simbir.Service.Interfaces.AccountInterface;
+using Simbir.Service.Interfaces.RentInterface;
 using Simbir.Service.Interfaces.TransportInterface;
 using System.Text;
 
@@ -78,9 +82,14 @@ builder.Services.AddScoped<IAccountAdminRepository, AccountAdminRepository>();
 builder.Services.AddScoped<IAccountAdminService, AccountAdminService>();
 
 builder.Services.AddScoped<ITransportRepository, TransportsRepository>();
-builder.Services.AddScoped<ITransportService, TransporstService>();
+builder.Services.AddScoped<ITransportService, TransportsService>();
 builder.Services.AddScoped<ITransportAdminService, TransportAdminService>();
 builder.Services.AddScoped<ITransportAdminRepository, TransportAdminRepository>();
+
+builder.Services.AddScoped<IRentService, RentsService>();
+builder.Services.AddScoped<IRentRepository, RentsRepository>();
+builder.Services.AddScoped<IRentAdminService, RentAdminService>();
+builder.Services.AddScoped<IRentAdminRepository, RentAdminRepository>();
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();

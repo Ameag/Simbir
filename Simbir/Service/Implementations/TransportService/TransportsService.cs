@@ -8,18 +8,19 @@ using Simbir.Repository.Interfaces.AccountInterfaces;
 using Simbir.Repository.Interfaces.TransportInterfaces;
 using Simbir.Service.Interfaces.TransportInterface;
 using Simbir.Service.Response;
+using System.Data.Entity.Spatial;
 using System.Drawing;
 using System.Net;
 
 namespace Simbir.Service.Implementations.TransportService
 {
-    public class TransporstService : ITransportService
+    public class TransportsService : ITransportService
     {
         private readonly ITransportRepository _transporstRepository;
         private readonly JWTBlackListCheck jWTBlackListCheck;
         private readonly CheckTypeTransport checkTypeTransport;
 
-        public TransporstService(ITransportRepository transporstRepository, IBlackListRepository blackListRepository)
+        public TransportsService(ITransportRepository transporstRepository, IBlackListRepository blackListRepository)
         {
             _transporstRepository = transporstRepository;
             jWTBlackListCheck = new JWTBlackListCheck(blackListRepository);
@@ -41,6 +42,7 @@ namespace Simbir.Service.Implementations.TransportService
                     throw new Exception("аккаунт не найден");
                 }
 
+
                 if (checkTypeTransport.Chek(model.transport_type))
                 {
                     var code = await _transporstRepository.Create(new Transport()
@@ -55,8 +57,7 @@ namespace Simbir.Service.Implementations.TransportService
                         longitude = model.longitude,
                         minute_price = model.minute_price,
                         day_price = model.day_price,
-                        owner_id = account
-
+                        owner_id = account,
                     });
                     baseResponse.Status = code;
                     return baseResponse;

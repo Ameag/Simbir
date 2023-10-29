@@ -16,5 +16,6 @@ namespace Simbir.Data
         public DbSet<Account> Accounts { get; set; } = null!;
         public DbSet<BlackList> BlackList { get; set; } = null!;
         public DbSet<Transport> Transport { get; set; } = null!;
+        public DbSet<Rent> Rent { get; set; } = null!;
     }
 }
