@@ -63,7 +63,7 @@ namespace Simbir.Service.Implementations.AccountService
                 {
                     return new BaseResponse<string>()
                     {
-                        Description = "[UpdateAccount] : Аккаунт с логином не существует"
+                        Description = "[SignIn] : Аккаунт с логином не существует"
                     };
                 }
 

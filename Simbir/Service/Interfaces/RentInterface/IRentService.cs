@@ -11,6 +11,6 @@ namespace Simbir.Service.Interfaces.RentInterface
         Task<IBaseResponse<HttpStatusCode>> AddNewRent (int idTransport, string price_type, string login, string jwtToken);
         Task<IBaseResponse<HttpStatusCode>> AddEndRent(string rentId, int lan, int lon, string login, string jwtToken);
         Task<IBaseResponse<Rent>> GetRent(string id, string login, string jwtToken);
-        Task<IBaseResponse<List<Rent>>> SearchTransport(double lan, double lon, double radius, string transport_type);
+        Task<IBaseResponse<List<Transport>>> SearchTransport(double lan, double lon, double radius, string transport_type);
     }
 }

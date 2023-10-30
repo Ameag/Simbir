@@ -20,6 +20,8 @@ namespace Simbir.Service.Implementations.RentService
         private readonly ITransportRepository _transportRepository;
         private readonly CheckTypePrice checkTypePrice;
         private readonly IAccountRepository _accountRepository;
+        private readonly SearchTransport searchTransport;
+        private readonly CheckTypeTransport checkTypeTransport;
         public RentsService(IRentRepository rentRepository, IBlackListRepository blackListRepository, ITransportRepository transportRepository, IAccountRepository accountRepository) 
         {
             _accountRepository = accountRepository;
@@ -27,6 +29,8 @@ namespace Simbir.Service.Implementations.RentService
             _transportRepository = transportRepository;
             jWTBlackListCheck = new JWTBlackListCheck(blackListRepository);
             checkTypePrice = new CheckTypePrice();
+            searchTransport = new SearchTransport();
+            checkTypeTransport = new CheckTypeTransport();
         }
 
         public async Task<IBaseResponse<HttpStatusCode>> AddEndRent(string rentId, int lan, int lon, string login, string jwtToken)
@@ -216,19 +220,33 @@ namespace Simbir.Service.Implementations.RentService
             }
         }
 
-        public async Task<IBaseResponse<List<Rent>>> SearchTransport (double lan, double lon, double radius, string transport_type)
+        public async Task<IBaseResponse<List<Transport>>> SearchTransport(double lan, double lon, double radius, string transport_type)
         {
-            var baseResponse = new BaseResponse<List<Rent>>();
+            var baseResponse = new BaseResponse<List<Transport>>();
             try
             {
-                var point = DbGeography.FromText($"POINT({lan} {lon})", Convert.ToInt32(radius));
-                var transport = _rentRepository.SearchTransport(point, radius);
-                baseResponse.Data = null;
-                return baseResponse;
+                if (checkTypeTransport.Chek(transport_type))
+                {
+                    var transport = _rentRepository.GetAllTransportType(transport_type);
+                    var sortTransport = searchTransport.GetTransports(await transport, lan, lon, radius);
+                    baseResponse.Data = sortTransport;
+                    return baseResponse;
+                }
+                else if (transport_type == "All")
+                {
+                    var transport = _rentRepository.GetAllTransport(transport_type);
+                    var sortTransport = searchTransport.GetTransports(await transport, lan, lon, radius);
+                    baseResponse.Data = sortTransport;
+                    return baseResponse;
+                }
+                else
+                {
+                    throw new Exception("неверный тип транспорта");
+                }
             }
             catch (Exception ex)
             {
-                return new BaseResponse<List<Rent>>()
+                return new BaseResponse<List<Transport>>()
                 {
                     Description = $"[GetAccount] : {ex.Message}"
                 };

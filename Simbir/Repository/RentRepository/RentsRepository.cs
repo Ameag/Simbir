@@ -90,5 +90,17 @@ namespace Simbir.Repository.RentRepository
              .ToListAsync();
 
         }
+        public async Task<List<Transport>> GetAllTransportType(string transport_type)
+        {
+            return await _db.Transport
+                .Where(x => x.transport_type == transport_type)
+                .ToListAsync();
+
+        }
+        public async Task<List<Transport>> GetAllTransport(string transport_type)
+        {
+            return await _db.Transport.ToListAsync();
+
+        }
     }
 }
