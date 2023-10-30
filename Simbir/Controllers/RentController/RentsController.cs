@@ -125,7 +125,6 @@ namespace Simbir.Controllers.RentController
             }
         }
 
-        [Authorize]
         [HttpGet("/api/Rent/Transport")]
         public async Task<ActionResult<List<Transport>>> SearchTransport(double lat, double lon, double radius, string transport_type)
         {
