@@ -8,7 +8,10 @@ namespace Simbir.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-
+            if (!Database.CanConnect())
+            {
+                Database.EnsureCreated();
+            }
         }
 
         public DbSet<Account> Accounts { get; set; } = null!;
